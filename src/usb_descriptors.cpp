@@ -26,6 +26,8 @@
 #include "tusb.h"
 #include "usb_descriptors.h"
 
+#include <stdarg.h> 
+
 /* A combination of interfaces must have a unique product id, since PC will save device driver after the first plug.
  * Same VID/PID with different interface e.g MSC (first), then CDC (later) will possibly cause system error on PC.
  *
@@ -121,15 +123,7 @@ uint8_t const * tud_descriptor_device_cb(void)
 //--------------------------------------------------------------------+
 // HID Report Descriptor
 //--------------------------------------------------------------------+
-/*
-uint8_t const desc_hid_report[] =
-{
-  TUD_HID_REPORT_DESC_KEYBOARD( HID_REPORT_ID(REPORT_ID_KEYBOARD         )),
-  TUD_HID_REPORT_DESC_MOUSE   ( HID_REPORT_ID(REPORT_ID_MOUSE            )),
-  TUD_HID_REPORT_DESC_CONSUMER( HID_REPORT_ID(REPORT_ID_CONSUMER_CONTROL )),
-  TUD_HID_REPORT_DESC_GAMEPAD ( HID_REPORT_ID(REPORT_ID_GAMEPAD          ))
-};
-*/
+
 // Invoked when received GET HID REPORT DESCRIPTOR
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
@@ -145,23 +139,30 @@ uint8_t const * tud_hid_descriptor_report_cb(uint8_t instance)
 
 enum
 {
-  ITF_NUM_HID,
-  ITF_NUM_TOTAL
+    ITF_NUM_CDC = 0,
+    ITF_NUM_CDC_DATA,
+    ITF_NUM_HID,
+
+    ITF_NUM_TOTAL
 };
 
+#if CONSOLE_DEBUG == 1
+#define CONFIG_TOTAL_LEN \
+    (TUD_CONFIG_DESC_LEN + TUD_CDC_DESC_LEN + TUD_HID_DESC_LEN)
+
+#else
 #define  CONFIG_TOTAL_LEN  (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN)
+#endif
 
-#define EPNUM_HID   0x81
-/*
-uint8_t const desc_configuration[] =
-{
-  // Config number, interface count, string index, total length, attribute, power in mA
-  TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
+#if CONSOLE_DEBUG == 1
+#define EPNUM_CDC_NOTIF   0x81
+#define EPNUM_CDC_OUT     0x02
+#define EPNUM_CDC_IN      0x82
 
-  // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
-  TUD_HID_DESCRIPTOR(ITF_NUM_HID, 0, HID_ITF_PROTOCOL_NONE, sizeof(desc_hid_report), EPNUM_HID, CFG_TUD_HID_EP_BUFSIZE, 5)
-};
-*/
+#define EPNUM_HID         0x83
+#else
+#define EPNUM_HID         0x81
+#endif
 
 uint8_t const desc_configuration[] =
 {
@@ -173,6 +174,15 @@ uint8_t const desc_configuration[] =
         TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP,
         100),
 
+    TUD_CDC_DESCRIPTOR(
+        ITF_NUM_CDC,
+        4,
+        EPNUM_CDC_NOTIF,
+        8,
+        EPNUM_CDC_OUT,
+        EPNUM_CDC_IN,
+        64),
+
     TUD_HID_DESCRIPTOR(
         ITF_NUM_HID,
         0,
@@ -180,7 +190,8 @@ uint8_t const desc_configuration[] =
         sizeof(desc_hid_report),
         EPNUM_HID,
         CFG_TUD_HID_EP_BUFSIZE,
-        5)
+        5),
+
 };
 
 #if TUD_OPT_HIGH_SPEED
@@ -258,7 +269,7 @@ enum {
 char const *string_desc_arr[] =
 {
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
-  "psdev.com",                   // 1: Manufacturer
+  "sysprog.pl",                  // 1: Manufacturer
   "Universal Button Matrix",     // 2: Product
   NULL,                          // 3: Serials will use unique ID if possible
 };
@@ -305,4 +316,29 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
   _desc_str[0] = (uint16_t) ((TUSB_DESC_STRING << 8) | (2 * chr_count + 2));
 
   return _desc_str;
+}
+
+void cdc_log_fmt(const char *fmt, ...)
+{
+    if (!tud_cdc_connected())
+        return;
+
+    char buffer[256];
+
+    va_list args;
+    va_start(args, fmt);
+    int len = vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_end(args);
+
+    if (len <= 0)
+        return;
+
+    tud_cdc_write(buffer, len);
+    tud_cdc_write_flush();
+}
+
+void cdc_log(const char *msg)
+{
+    tud_cdc_write(msg, strlen(msg));
+    tud_cdc_write_flush();
 }

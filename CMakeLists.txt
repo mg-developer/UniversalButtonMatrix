@@ -46,14 +46,7 @@ else()
         ${CMAKE_CURRENT_LIST_DIR}/src
     )
 
-    file(READ "${CMAKE_CURRENT_LIST_DIR}/src/board_config.h" BOARD_CONFIG_H_CONTENTS)
-    if(BOARD_CONFIG_H_CONTENTS MATCHES "#define[ \t]+CONSOLE_DEBUG[ \t]+1")
-        pico_enable_stdio_uart(UniversalButtonMatrix 1)
-    else()
-        pico_enable_stdio_uart(UniversalButtonMatrix 0)
-    endif()
     pico_enable_stdio_usb(UniversalButtonMatrix 0)
-
     pico_add_extra_outputs(UniversalButtonMatrix)
 endif()
 

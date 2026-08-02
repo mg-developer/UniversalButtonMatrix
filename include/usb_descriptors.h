@@ -32,4 +32,7 @@ enum
   REPORT_ID_COUNT
 };
 
+void cdc_log_fmt(const char *fmt, ...);
+void cdc_log(const char *msg);
+
 #endif /* USB_DESCRIPTORS_H_ */

@@ -26,15 +26,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
 
-#include "board_config.h"
+#include "shiftregister.h"
 #include "bsp/board_api.h"
 #include "tusb.h"
 
 #include "usb_descriptors.h"
 
 static_assert(VARIANT_32_BUTTONS_ENABLED + VARIANT_64_BUTTONS_ENABLED + VARIANT_128_BUTTONS_ENABLED == 1, "Exactly one button variant must be enabled");
-
 
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
@@ -55,8 +55,10 @@ static uint32_t blink_interval_ms = BLINK_NOT_MOUNTED;
 
 void led_blinking_task(void);
 void hid_task(void);
+void cdc_task(void);
 void button_task(void);
 void set_button(uint8_t button, bool pressed);
+void cdc_log_print(const char *msg);
 
 bool Buttons[128] = {};
 
@@ -72,6 +74,7 @@ static_assert(sizeof(GamepadReport) == 26);
 
 struct GamepadReport report;
 
+
 /*------------- MAIN -------------*/
 int main()
 {
@@ -85,17 +88,52 @@ int main()
   TU_ASSERT(tud_rhport_init(BOARD_TUD_RHPORT, &rh_init));
   board_init_after_tusb();
 
+  ButtonState bt_set{};
+
+  static bool startup_logged = false;
+  static bool connected = false;
+  static absolute_time_t connected_time;
+  int logline = 0;
   while (1)
   {
-    tud_task(); // tinyusb device task
-    
-    button_task();
+      tud_task();
 
-    //led_blinking_task();
+  #if CONSOLE_DEBUG == 1
 
-    hid_task();
+
+    if (tud_cdc_connected())
+    {
+        if (!connected)
+        {
+            connected = true;
+            connected_time = get_absolute_time();
+        }
+
+        if (!startup_logged &&
+            absolute_time_diff_us(connected_time, get_absolute_time()) > 500000)
+        {
+            cdc_log_fmt("%d: Configured ROWxCOL [%dx%d]\r\n",
+                      logline++,
+                      BUTTON_OUTPUT_ROWS,
+                      BUTTON_INPUT_COLUMNS);
+
+            startup_logged = true;
+        }
+    }
+    else
+    {
+        connected = false;
+    }
+
+  #endif
+
+      button_board_handle(bt_set);
+      hid_task();
+      sleep_us(5000);
   }
+
 }
+
 
 //--------------------------------------------------------------------+
 // Device callbacks
@@ -190,6 +228,64 @@ void hid_task(void)
     // Send the 1st of report chain, the rest will be sent by tud_hid_report_complete_cb()
     send_hid_report(REPORT_ID_GAMEPAD, 0xAAAAAAAA);
   }
+}
+
+
+//--------------------------------------------------------------------+
+// USB CDC
+//--------------------------------------------------------------------+
+void cdc_task(void) 
+{
+  // connected() check for DTR bit
+  // Most but not all terminal client set this when making connection
+  // if ( tud_cdc_connected() )
+  {
+    // connected and there are data available
+    if (tud_cdc_available()) {
+      // read data
+      char buf[64];
+      uint32_t count = tud_cdc_read(buf, sizeof(buf));
+      (void) count;
+
+      // Echo back
+      // Note: Skip echo by commenting out write() and write_flush()
+      // for throughput test e.g
+      //    $ dd if=/dev/zero of=/dev/ttyACM0 count=10000
+      tud_cdc_write(buf, count);
+      tud_cdc_write_flush();
+    }
+  }
+}
+
+void cdc_log_print(const char *msg)
+{
+  //if ( tud_cdc_connected() )
+  {
+    // connected and there are data available
+    //if (tud_cdc_available()) 
+    {
+      tud_cdc_write(msg, strlen(msg));
+      tud_cdc_write_flush();
+    }
+  }
+}
+
+// Invoked when cdc when line state changed e.g connected/disconnected
+void tud_cdc_line_state_cb(uint8_t itf, bool dtr, bool rts) {
+  (void) itf;
+  (void) rts;
+
+  // TODO set some indicator
+  if (dtr) {
+    // Terminal connected
+  } else {
+    // Terminal disconnected
+  }
+}
+
+// Invoked when CDC interface received data from host
+void tud_cdc_rx_cb(uint8_t itf) {
+  (void) itf;
 }
 
 // Invoked when sent REPORT successfully to host
@@ -303,14 +399,3 @@ void set_button(uint8_t button, bool pressed)
         Buttons[byte] &= ~(1 << bit);
 }
 
-//--------------------------------------------------------------------+
-// BUTTON TASK (DISABLED)
-//--------------------------------------------------------------------+
-
-void button_task(void)
-{
-
-
-
-
-}

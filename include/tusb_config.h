@@ -24,6 +24,8 @@
 #ifndef _TUSB_CONFIG_H_
 #define _TUSB_CONFIG_H_
 
+#include "board_config.h"
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -90,13 +92,16 @@
 
 //------------- CLASS -------------//
 #define CFG_TUD_HID               1
-#define CFG_TUD_CDC               0
+#define CFG_TUD_CDC               CONSOLE_DEBUG
 #define CFG_TUD_MSC               0
 #define CFG_TUD_MIDI              0
 #define CFG_TUD_VENDOR            0
 
 // HID buffer size Should be sufficient to hold ID (if any) + Data
 #define CFG_TUD_HID_EP_BUFSIZE    32
+
+#define CFG_TUD_CDC_RX_BUFSIZE 256
+#define CFG_TUD_CDC_TX_BUFSIZE 256
 
 #ifdef __cplusplus
  }

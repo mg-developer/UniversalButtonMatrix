@@ -31,6 +31,7 @@
 
 #include "board_config.h"
 #include "shiftregister.h"
+#include "key_host.h"
 
 #ifdef _WIN32
 #include <conio.h>
@@ -233,3 +234,14 @@ int main()
     std::cout << "Exiting host test.\n";
     return 0;
 }
+
+TimePoint get_absolute_time()
+{
+    return std::chrono::steady_clock::now();
+}
+
+int64_t absolute_time_diff_us(TimePoint from, TimePoint to)
+{
+    return std::chrono::duration_cast<std::chrono::microseconds>(to - from).count();
+}
+

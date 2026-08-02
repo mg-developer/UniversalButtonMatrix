@@ -25,13 +25,20 @@
 
 #if HOST_BUILD == 0 
 #include "pico/stdlib.h"
+#include "tusb.h"
+#include "usb_descriptors.h"
+
+using time_type = absolute_time_t;
+
 #else
 #include "key_host.h"
+using time_type = TimePoint;
 #endif
 
 #include "shiftregister.h"
 #include <array>
 #include <cstdint>
+#include <cstdio>
 
 constexpr uint32_t CLK_TIME_US = 300; // 0.0003 s
 
@@ -65,7 +72,16 @@ void gpio_pull_down(uint8_t pin)
 {
     // Simulate GPIO pull-down in host build (no-op)
 }
+#else
+
+void log_print(const char *msg)
+{ 
+  tud_cdc_write(msg, strlen(msg));
+  tud_cdc_write_flush();
+}
+
 #endif
+
 
 enum
 {
@@ -199,8 +215,11 @@ std::array<bool, BUTTON_OUTPUT_ROWS> key_column_check(uint8_t col)
     return state;
 }
 
+
+
 void button_board_handle(ButtonState& bt_set)
 {
+    /*
     for (uint8_t c = 0; c < BUTTON_INPUT_COLUMNS; ++c)
     {
         uint16_t base = c * BUTTON_OUTPUT_ROWS;
@@ -209,19 +228,28 @@ void button_board_handle(ButtonState& bt_set)
         for (uint8_t r = 0; r < BUTTON_OUTPUT_ROWS; ++r)
             bt_set[base + r] = state[r];
     }
+    */
 
 #if CONSOLE_DEBUG == 1
-    for (uint8_t c = 0; c < BUTTON_INPUT_COLUMNS; ++c)
-        printf("%u ", c);
-    printf("\n");
+    static time_type previous_time = {};
 
-    for (uint8_t r = 0; r < BUTTON_OUTPUT_ROWS; ++r)
+    if (absolute_time_diff_us(previous_time, get_absolute_time()) > 1500000)
     {
+        previous_time = get_absolute_time();
+
         for (uint8_t c = 0; c < BUTTON_INPUT_COLUMNS; ++c)
+            cdc_log_fmt("%u ", c);
+        cdc_log("\r\n");
+
+        for (uint8_t r = 0; r < BUTTON_OUTPUT_ROWS; ++r)
         {
-            printf("%c ", bt_set[c * BUTTON_OUTPUT_ROWS + r] ? 'T' : 'F');
+            for (uint8_t c = 0; c < BUTTON_INPUT_COLUMNS; ++c)
+            {
+                cdc_log_fmt("%c ", bt_set[c * BUTTON_OUTPUT_ROWS + r] ? 'T' : 'F');
+            }
+            cdc_log("\r\n");
         }
-        printf("\n");
+        cdc_log("\r\n");
     }
 #endif
 }

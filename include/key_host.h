@@ -26,6 +26,15 @@
  #ifndef KEY_HOST_H
  #define KEY_HOST_H
 
+#include <chrono>
+
 bool VirtualGPIO_get(int key);
+
+#define cdc_log_fmt  printf
+#define cdc_log  printf
+
+using TimePoint = std::chrono::steady_clock::time_point;
+TimePoint get_absolute_time();
+int64_t absolute_time_diff_us(TimePoint from, TimePoint to);
 
  #endif // KEY_HOST_H
