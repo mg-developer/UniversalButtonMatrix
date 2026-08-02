@@ -137,6 +137,7 @@ uint8_t const * tud_hid_descriptor_report_cb(uint8_t instance)
 // Configuration Descriptor
 //--------------------------------------------------------------------+
 
+#if CONSOLE_DEBUG == 1
 enum
 {
     ITF_NUM_CDC = 0,
@@ -145,6 +146,14 @@ enum
 
     ITF_NUM_TOTAL
 };
+#else
+enum
+{
+    ITF_NUM_HID = 0,
+
+    ITF_NUM_TOTAL
+};
+#endif
 
 #if CONSOLE_DEBUG == 1
 #define CONFIG_TOTAL_LEN \
@@ -173,7 +182,7 @@ uint8_t const desc_configuration[] =
         CONFIG_TOTAL_LEN,
         TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP,
         100),
-
+#if CONSOLE_DEBUG == 1
     TUD_CDC_DESCRIPTOR(
         ITF_NUM_CDC,
         4,
@@ -182,7 +191,7 @@ uint8_t const desc_configuration[] =
         EPNUM_CDC_OUT,
         EPNUM_CDC_IN,
         64),
-
+#endif
     TUD_HID_DESCRIPTOR(
         ITF_NUM_HID,
         0,
@@ -320,6 +329,7 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
 
 void cdc_log_fmt(const char *fmt, ...)
 {
+#if CONSOLE_DEBUG == 1
     if (!tud_cdc_connected())
         return;
 
@@ -335,10 +345,13 @@ void cdc_log_fmt(const char *fmt, ...)
 
     tud_cdc_write(buffer, len);
     tud_cdc_write_flush();
+#endif
 }
 
 void cdc_log(const char *msg)
 {
+#if CONSOLE_DEBUG == 1
     tud_cdc_write(msg, strlen(msg));
     tud_cdc_write_flush();
+#endif
 }

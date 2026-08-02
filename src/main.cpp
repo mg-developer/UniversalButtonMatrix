@@ -230,7 +230,7 @@ void hid_task(void)
   }
 }
 
-
+#if CONSOLE_DEBUG == 1
 //--------------------------------------------------------------------+
 // USB CDC
 //--------------------------------------------------------------------+
@@ -256,19 +256,8 @@ void cdc_task(void)
     }
   }
 }
+#endif
 
-void cdc_log_print(const char *msg)
-{
-  //if ( tud_cdc_connected() )
-  {
-    // connected and there are data available
-    //if (tud_cdc_available()) 
-    {
-      tud_cdc_write(msg, strlen(msg));
-      tud_cdc_write_flush();
-    }
-  }
-}
 
 // Invoked when cdc when line state changed e.g connected/disconnected
 void tud_cdc_line_state_cb(uint8_t itf, bool dtr, bool rts) {

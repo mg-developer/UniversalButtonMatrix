@@ -72,14 +72,6 @@ void gpio_pull_down(uint8_t pin)
 {
     // Simulate GPIO pull-down in host build (no-op)
 }
-#else
-
-void log_print(const char *msg)
-{ 
-  tud_cdc_write(msg, strlen(msg));
-  tud_cdc_write_flush();
-}
-
 #endif
 
 
