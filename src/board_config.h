@@ -1,6 +1,8 @@
 /*
  * The MIT License (MIT)
  *
+ * Copyright (c) 2026 Michał Głuszek (sysprog.pl)
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -18,18 +20,16 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
  */
 
-#ifndef USB_DESCRIPTORS_H_
-#define USB_DESCRIPTORS_H_
+#ifndef BOARD_CONFIG_H
+#define BOARD_CONFIG_H
 
-enum
-{
-  REPORT_ID_KEYBOARD = 1,
-  REPORT_ID_MOUSE,
-  REPORT_ID_CONSUMER_CONTROL,
-  REPORT_ID_GAMEPAD,
-  REPORT_ID_COUNT
-};
+#define CONSOLE_DEBUG 0
 
-#endif /* USB_DESCRIPTORS_H_ */
+#define VARIANT_32_BUTTONS_ENABLED 1
+#define VARIANT_64_BUTTONS_ENABLED 0
+#define VARIANT_128_BUTTONS_ENABLED 0
+
+#endif // BOARD_CONFIG_H

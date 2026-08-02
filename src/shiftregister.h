@@ -1,6 +1,8 @@
 /*
  * The MIT License (MIT)
  *
+ * Copyright (c) 2026 Michał Głuszek (sysprog.pl)
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -18,18 +20,34 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
  */
 
-#ifndef USB_DESCRIPTORS_H_
-#define USB_DESCRIPTORS_H_
+#ifndef SHIFTREGISTER_H
+#define SHIFTREGISTER_H
 
-enum
-{
-  REPORT_ID_KEYBOARD = 1,
-  REPORT_ID_MOUSE,
-  REPORT_ID_CONSUMER_CONTROL,
-  REPORT_ID_GAMEPAD,
-  REPORT_ID_COUNT
-};
+#include "board_config.h"
+#include <array>
 
-#endif /* USB_DESCRIPTORS_H_ */
+static_assert(VARIANT_32_BUTTONS_ENABLED + VARIANT_64_BUTTONS_ENABLED + VARIANT_128_BUTTONS_ENABLED == 1, "Exactly one button variant must be enabled");
+
+#if (VARIANT_32_BUTTONS_ENABLED)
+#define BUTTON_OUTPUT_ROWS 6
+#define BUTTON_INPUT_COLUMNS 5
+#endif
+
+#if (VARIANT_64_BUTTONS_ENABLED)
+#define BUTTON_OUTPUT_ROWS 7
+#define BUTTON_INPUT_COLUMNS 10
+#endif
+
+#if (VARIANT_128_BUTTONS_ENABLED)
+#define BUTTON_OUTPUT_ROWS 13
+#define BUTTON_INPUT_COLUMNS 10
+#endif
+
+using ButtonState = std::array<bool, BUTTON_OUTPUT_ROWS * BUTTON_INPUT_COLUMNS>;
+
+void button_board_handle(ButtonState& bt_set);
+
+#endif // SHIFTREGISTER_H
