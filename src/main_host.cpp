@@ -23,14 +23,14 @@
  *
  */
 
-#include "board_config.h"
-#include "shiftregister.h"
-
 #include <atomic>
 #include <chrono>
 #include <iostream>
-#include <thread>
 #include <map>
+#include <thread>
+
+#include "board_config.h"
+#include "shiftregister.h"
 
 #ifdef _WIN32
 #include <conio.h>

@@ -2,10 +2,12 @@ cmake_minimum_required(VERSION 3.13)
 
 option(HOST_BUILD "Build for host/x86 for testing" OFF)
 
+include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
+
 if(HOST_BUILD)
     project(UniversalButtonMatrix_host C CXX)
 
-    file(GLOB SRC_HEADERS "${CMAKE_CURRENT_LIST_DIR}/src/*.h")
+    file(GLOB SRC_HEADERS "${CMAKE_CURRENT_LIST_DIR}/include/*.h")
 
     add_executable(UniversalButtonMatrix_host
         src/main_host.cpp
@@ -14,7 +16,10 @@ if(HOST_BUILD)
     )
 
     target_compile_definitions(UniversalButtonMatrix_host PRIVATE HOST_BUILD=1)
-    target_include_directories(UniversalButtonMatrix_host PRIVATE ${CMAKE_CURRENT_LIST_DIR}/src)
+    target_include_directories(UniversalButtonMatrix_host PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/src
+        ${CMAKE_CURRENT_LIST_DIR}/include
+    )
 
     # Host build: nothing else required, use system toolchain
 else()
