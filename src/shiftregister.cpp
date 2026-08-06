@@ -40,7 +40,7 @@ using time_type = TimePoint;
 #include <cstdint>
 #include <cstdio>
 
-constexpr uint32_t CLK_TIME_US = 300; // 0.0003 s
+constexpr uint32_t CLK_TIME_US = 20; // 0.0003 s
 
 #if HOST_BUILD == 1 
 enum
@@ -118,23 +118,21 @@ void clk()
 
 void latch()
 {
-    sleep_us(CLK_TIME_US * 3);
     gpio_put(button_pins[LATCH], true);
-    sleep_us(CLK_TIME_US * 3);
+    sleep_us(CLK_TIME_US * 2);
     gpio_put(button_pins[LATCH], false);
 }
 
 void latch_open()
 {
-    sleep_us(CLK_TIME_US * 3);
     gpio_put(button_pins[LATCH], true);
-    sleep_us(CLK_TIME_US * 3);
+    sleep_us(CLK_TIME_US * 2);
 }
 
 void latch_release()
 {
-    sleep_us(CLK_TIME_US * 3);
     gpio_put(button_pins[LATCH], false);
+    sleep_us(CLK_TIME_US * 2);    
 }
 
 void clr()
@@ -156,15 +154,40 @@ void clr_all()
 
 void register_push(uint32_t value, uint8_t bit_count)
 {
-    for (int bit = bit_count - 1; bit >= 0; --bit)
+    for (uint32_t mask = 1u << (bit_count - 1); mask > 0; mask >>= 1)
     {
-        bool state = (value >> bit) & 1;
+        bool state = (value & mask) != 0;
+
+    //for (int bit = bit_count - 1; bit >= 0; --bit)
+    //{
+    //    bool state = (value >> bit) & 1;
         gpio_put(button_pins[DATA], state);
         clk();
     }
 }
 
-void gpio_init_all_buttons()
+std::array<bool, BUTTON_OUTPUT_ROWS> key_column_check(uint8_t col, uint8_t max_col)
+{
+    uint32_t reg = 1 << col;
+    register_push(reg, max_col);
+    std::array<bool, BUTTON_OUTPUT_ROWS> state{};
+
+    latch_open();
+
+    for (uint8_t i = 0; i < BUTTON_OUTPUT_ROWS; ++i)
+    {
+        state[i] = gpio_get(button_pins_in[i]);
+    }
+
+    sleep_us(CLK_TIME_US * 2);
+    latch_release();
+    clr_all();
+
+    return state;
+}
+
+
+void button_board_init()
 {
     // Outputs
     for (auto pin : button_pins)
@@ -184,45 +207,33 @@ void gpio_init_all_buttons()
 
     gpio_put(button_pins[LATCH], true);
     gpio_put(button_pins[DATA], false);
+
 }
-
-std::array<bool, BUTTON_OUTPUT_ROWS> key_column_check(uint8_t col)
-{
-    uint32_t reg = 1 << col;
-    register_push(reg, 32);
-    std::array<bool, BUTTON_OUTPUT_ROWS> state{};
-
-    latch_open();
-    sleep_us(CLK_TIME_US * 8);
-
-    for (uint8_t i = 0; i < BUTTON_OUTPUT_ROWS; ++i)
-    {
-        state[i] = gpio_get(button_pins_in[i]);
-    }
-
-    sleep_us(CLK_TIME_US * 2);
-    latch_release();
-    clr_all();
-
-    return state;
-}
-
-
 
 void button_board_handle(ButtonState& bt_set)
 {
-    /*
+#if CONSOLE_DEBUG_VERBOSITY_LEVEL > 0     
+    static int loop_count = 0;
+    time_type start = get_absolute_time();
+#endif
+
     for (uint8_t c = 0; c < BUTTON_INPUT_COLUMNS; ++c)
     {
         uint16_t base = c * BUTTON_OUTPUT_ROWS;
-        auto state = key_column_check(c);
+        auto state = key_column_check(c, BUTTON_INPUT_COLUMNS+1);
 
         for (uint8_t r = 0; r < BUTTON_OUTPUT_ROWS; ++r)
             bt_set[base + r] = state[r];
     }
-    */
 
-#if CONSOLE_DEBUG == 1
+#if CONSOLE_DEBUG_VERBOSITY_LEVEL > 0  
+    if(loop_count++ % 100 == 0)
+    {
+        cdc_log_fmt("- Register shift time:%lld \r\n", absolute_time_diff_us(start, get_absolute_time()));
+    }
+#endif
+
+#if CONSOLE_DEBUG_VERBOSITY_LEVEL > 1
     static time_type previous_time = {};
 
     if (absolute_time_diff_us(previous_time, get_absolute_time()) > 1500000)

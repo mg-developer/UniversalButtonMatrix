@@ -88,6 +88,8 @@ int main()
   TU_ASSERT(tud_rhport_init(BOARD_TUD_RHPORT, &rh_init));
   board_init_after_tusb();
 
+  button_board_init();
+
   ButtonState bt_set{};
 
   static bool startup_logged = false;
@@ -98,9 +100,7 @@ int main()
   {
       tud_task();
 
-  #if CONSOLE_DEBUG == 1
-
-
+  #if CONSOLE_DEBUG_VERBOSITY_LEVEL > 0
     if (tud_cdc_connected())
     {
         if (!connected)
@@ -129,7 +129,7 @@ int main()
 
       button_board_handle(bt_set);
       hid_task();
-      sleep_us(5000);
+      sleep_us(100);
   }
 
 }
@@ -230,7 +230,7 @@ void hid_task(void)
   }
 }
 
-#if CONSOLE_DEBUG == 1
+#if CONSOLE_DEBUG_VERBOSITY_LEVEL > 0
 //--------------------------------------------------------------------+
 // USB CDC
 //--------------------------------------------------------------------+

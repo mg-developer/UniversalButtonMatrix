@@ -48,6 +48,7 @@ static_assert(VARIANT_32_BUTTONS_ENABLED + VARIANT_64_BUTTONS_ENABLED + VARIANT_
 
 using ButtonState = std::array<bool, BUTTON_OUTPUT_ROWS * BUTTON_INPUT_COLUMNS>;
 
+void button_board_init();
 void button_board_handle(ButtonState& bt_set);
 
 #endif // SHIFTREGISTER_H
