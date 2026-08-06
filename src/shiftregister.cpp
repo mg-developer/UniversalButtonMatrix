@@ -229,7 +229,7 @@ void button_board_handle(ButtonState& bt_set)
 #if CONSOLE_DEBUG_VERBOSITY_LEVEL > 0  
     if(loop_count++ % 100 == 0)
     {
-        cdc_log_fmt("- Register shift time:%lld \r\n", absolute_time_diff_us(start, get_absolute_time()));
+        cdc_log_fmt("- Register shift time:%lld[us] \r\n", absolute_time_diff_us(start, get_absolute_time()));
     }
 #endif
 
