@@ -41,6 +41,15 @@
 #define USB_VID   0xCafe
 #define USB_BCD   0x0200
 
+#if defined(VARIANT_32_BUTTONS_ENABLED)
+#define MODULE_NAME "Universal Button Matrix (32B)"
+#elif defined(VARIANT_64_BUTTONS_ENABLED)
+#define MODULE_NAME "Universal Button Matrix (64B)"
+#elif defined(VARIANT_128_BUTTONS_ENABLED)
+#define MODULE_NAME "Universal Button Matrix (128B)"
+#else
+#define MODULE_NAME "Universal Button Matrix"
+#endif
 //--------------------------------------------------------------------+
 // Device Descriptors
 //--------------------------------------------------------------------+
@@ -67,7 +76,7 @@ tusb_desc_device_t const desc_device =
 
 //---------------------------------------------------------
 // HID REPORT
-// 128 buttons
+// (max. 128 buttons, 16 axis)
 //---------------------------------------------------------
 
 uint8_t const desc_hid_report[] =
@@ -80,13 +89,14 @@ uint8_t const desc_hid_report[] =
     // --- 64 Digital Buttons (8 Bytes) ---
     0x05, 0x09,        //   USAGE_PAGE (Button)
     0x19, 0x01,        //   USAGE_MINIMUM (Button 1)
-    0x29, 0x80,        //   USAGE_MAXIMUM (Button 64) -> changed to 128
+    0x29, 0x80,        //   USAGE_MAXIMUM (Button 128) 
     0x15, 0x00,        //   LOGICAL_MINIMUM (0)
     0x25, 0x01,        //   LOGICAL_MAXIMUM (1)
-    0x95, 0x80,        //   REPORT_COUNT (64) -> changed to 128
+    0x95, 0x80,        //   REPORT_COUNT (128)
     0x75, 0x01,        //   REPORT_SIZE (1)
     0x81, 0x02,        //   INPUT (Data,Var,Abs)
 
+  #if defined(SUPPORT_3_AXIS) || defined(SUPPORT_9_AXIS) || defined(SUPPORT_16_AXIS)
     // -----------------------------------------------------------------
     // 16 Axes (8-bit signed)
     // -----------------------------------------------------------------
@@ -94,19 +104,39 @@ uint8_t const desc_hid_report[] =
 
     0x09, 0x30,        // X
     0x09, 0x31,        // Y
-    0x09, 0x32,        // Z
+    0x09, 0x32,        // Z  (3 axis)
+#endif
+
+#if defined(SUPPORT_9_AXIS) || defined(SUPPORT_16_AXIS) 
     0x09, 0x33,        // Rx
     0x09, 0x34,        // Ry
     0x09, 0x35,        // Rz
-    0x09, 0x37,        // Slider
-    0x09, 0x38,        // Slider
-    0x09, 0x39,        // Slider
-    0x09, 0x3A,        // Slider
+    0x09, 0x37,        // Slider-1
+    0x09, 0x38,        // Slider-2
+    0x09, 0x39,        // Slider-3  (9 axis)
+#endif
+
+#if defined(SUPPORT_16_AXIS) 
+    0x09, 0x3A,        // Slider-4 
+    0x09, 0x3B,        // Slider-5 
+    0x09, 0x3C,        // Slider-6 
+
+    0x09, 0x3D,        // Slider-7 
+    0x09, 0x3E,        // Slider-8 
+    0x09, 0x3F,        // Slider-9 
+    0x09, 0x40,        // Slider-4  (16 axis)
+#endif
 
     0x15, 0x81,        // LOGICAL_MINIMUM (-127)
     0x25, 0x7F,        // LOGICAL_MAXIMUM (127)
     0x75, 0x08,        // REPORT_SIZE (8)
-    0x95, 0x0A,        // REPORT_COUNT (9)
+#if defined(SUPPORT_3_AXIS)
+    0x95, 0x03,    // 3 axes
+#elif defined(SUPPORT_9_AXIS)
+    0x95, 0x09,    // 9 axes
+#elif defined(SUPPORT_16_AXIS)
+    0x95, 0x10,    // 16 axes
+#endif
     0x81, 0x02,
 
     0xC0               // END_COLLECTION
@@ -279,8 +309,8 @@ char const *string_desc_arr[] =
 {
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
   "sysprog.pl",                  // 1: Manufacturer
-  "Universal Button Matrix",     // 2: Product
-  NULL,                          // 3: Serials will use unique ID if possible
+  MODULE_NAME,                   // 2: Product
+  "1",                           // 3: Serials will use unique ID if possible
 };
 
 static uint16_t _desc_str[32 + 1];

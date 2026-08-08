@@ -26,17 +26,28 @@
 #ifndef BOARD_CONFIG_H
 #define BOARD_CONFIG_H
 
-//Defined in CMake
+//Defines are overrided by CMake options
 
 //#define CONSOLE_DEBUG 1
 
 //#define VARIANT_32_BUTTONS_ENABLED 1
-//#define VARIANT_64_BUTTONS_ENABLED 0
-//#define VARIANT_128_BUTTONS_ENABLED 0
+//#define VARIANT_64_BUTTONS_ENABLED 1
+//#define VARIANT_128_BUTTONS_ENABLED 1
 
-//#define SUPPORT_3_AXIS 0
-//#define SUPPORT_9_AXIS 0
-//#define SUPPORT_16_AXIS 0
+//Disabled in current application
+#define SUPPORT_3_AXIS 1
+//#define SUPPORT_9_AXIS 1
+//#define SUPPORT_16_AXIS 1
 
+
+#if defined(SUPPORT_3_AXIS)
+#define EnabledAxisSupportCount 3
+#elif defined(SUPPORT_9_AXIS)
+#define EnabledAxisSupportCount 9
+#elif defined(SUPPORT_16_AXIS)
+#define EnabledAxisSupportCount 16
+#else
+#define EnabledAxisSupportCount 0
+#endif
 
 #endif // BOARD_CONFIG_H

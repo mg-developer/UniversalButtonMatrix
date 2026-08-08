@@ -3,11 +3,10 @@ cmake_minimum_required(VERSION 3.13)
 
 option(HOST_BUILD "Build for host/x86 for testing" OFF)
 option(VARIANT_32_BUTTONS_ENABLED "Enable the 32-button variant configuration" OFF)
-option(VARIANT_64_BUTTONS_ENABLED "Enable the 32-button variant configuration" OFF)
-option(VARIANT_128_BUTTONS_ENABLED "Enable the 32-button variant configuration" OFF)
+option(VARIANT_64_BUTTONS_ENABLED "Enable the 64-button variant configuration" OFF)
+option(VARIANT_128_BUTTONS_ENABLED "Enable the 128-button variant configuration" OFF)
 set(CONSOLE_DEBUG "MEDIUM" CACHE STRING "Console debug level")
 set_property(CACHE CONSOLE_DEBUG PROPERTY STRINGS "OFF" "LOW" "MEDIUM" "HIGH")
-
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
 
@@ -56,22 +55,27 @@ else()
   
     target_compile_definitions(${PROJECT_NAME} PRIVATE HOST_BUILD=0)
   
+    target_compile_options(${PROJECT_NAME} PRIVATE -Og -g3)
+
     pico_enable_stdio_usb(${PROJECT_NAME} 0)
     pico_add_extra_outputs(${PROJECT_NAME})
 endif()
 
 if(VARIANT_32_BUTTONS_ENABLED)
     target_compile_definitions(${PROJECT_NAME} PRIVATE VARIANT_32_BUTTONS_ENABLED=1)
+    set(UF2_NAME "_32BTN")
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE VARIANT_32_BUTTONS_ENABLED=0)
 endif()
 if(VARIANT_64_BUTTONS_ENABLED)
     target_compile_definitions(${PROJECT_NAME} PRIVATE VARIANT_64_BUTTONS_ENABLED=1)
+    set(UF2_NAME "_64BTN")
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE VARIANT_64_BUTTONS_ENABLED=0)
 endif()
 if(VARIANT_128_BUTTONS_ENABLED)
     target_compile_definitions(${PROJECT_NAME} PRIVATE VARIANT_128_BUTTONS_ENABLED=1)
+    set(UF2_NAME "_128BTN")
 else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE VARIANT_128_BUTTONS_ENABLED=0)
 endif()
@@ -89,5 +93,7 @@ else()
 endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE CONSOLE_DEBUG_VERBOSITY_LEVEL=${NUM_LEVEL})
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}${UF2_NAME}")
+
 
 

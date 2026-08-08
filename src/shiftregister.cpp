@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  *
  */
+#include "shiftregister.h"
 
 #if HOST_BUILD == 0 
 #include "pico/stdlib.h"
@@ -35,7 +36,6 @@ using time_type = absolute_time_t;
 using time_type = TimePoint;
 #endif
 
-#include "shiftregister.h"
 #include <array>
 #include <cstdint>
 #include <cstdio>
@@ -91,10 +91,10 @@ constexpr std::array<uint8_t, 4> button_pins =
     14, // CLK
 };
 
-// Input pins for reading button (columns or rows)states
+// Input pins for reading button (columns or rows) states
 // Theoretically, we can handle up to:
-// 3*ShiftRegister 74LS573 (3*8) = 24 colums
-// 10*RP2040 GPIOs = 10 rows
+// 3*ShiftRegister 74LS573 (3*8bit) = 24 colums
+// 10*RP2040-GPIOs = 10 rows
 // 24*10 = 240 buttons but in practice, we can handle up to 128 as USB HID device can handle.
 
 constexpr std::array<uint8_t, 10> button_pins_in =

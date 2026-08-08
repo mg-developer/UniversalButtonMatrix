@@ -65,12 +65,17 @@ bool Buttons[128] = {};
 #pragma pack(push,1)
 struct GamepadReport
 {
-    uint8_t buttons[16]; // 64 buttons
-    int8_t  axis[10]; // 16 axis
+    uint8_t buttons[16];
+
+#if defined(SUPPORT_3_AXIS) || \
+    defined(SUPPORT_9_AXIS) || \
+    defined(SUPPORT_16_AXIS)
+    int8_t axes[EnabledAxisSupportCount];
+#endif
 };
 #pragma pack(pop)
 
-static_assert(sizeof(GamepadReport) == 26);
+static_assert(sizeof(GamepadReport) == 16 + (EnabledAxisSupportCount));
 
 struct GamepadReport report;
 
@@ -89,8 +94,6 @@ int main()
   board_init_after_tusb();
 
   button_board_init();
-
-  ButtonState bt_set{};
 
   static bool startup_logged = false;
   static bool connected = false;
@@ -126,14 +129,28 @@ int main()
     }
 
   #endif
-
-      button_board_handle(bt_set);
+    
       hid_task();
       sleep_us(100);
   }
 
 }
 
+bool fill_report(GamepadReport& dst_gr, const ButtonState& src_state)
+{
+    //std::memset(dst_gr.buttons, 0, sizeof(dst_gr.buttons));
+    bool some_key_pressed = false;
+
+    for (size_t i = 0; i < src_state.size() && i < 128; ++i)
+    {
+        if (src_state[i])
+        {
+            dst_gr.buttons[i / 8] |= static_cast<uint8_t>(1u << (i % 8));
+            some_key_pressed = true;
+        }
+    }
+    return some_key_pressed;
+}
 
 //--------------------------------------------------------------------+
 // Device callbacks
@@ -170,7 +187,7 @@ void tud_resume_cb()
 // USB HID
 //--------------------------------------------------------------------+
 
-static void send_hid_report(uint8_t report_id, uint32_t btn)
+static void send_hid_report(uint8_t report_id, const GamepadReport &gr_source)
 {
   // skip if hid is not ready yet
   if ( !tud_hid_ready() ) return;
@@ -183,12 +200,9 @@ static void send_hid_report(uint8_t report_id, uint32_t btn)
       static bool has_gamepad_key = false;
 
       memset(&report, 0, sizeof(report));
+      // Deep copy
+      report = gr_source;
 
-      report.buttons[0]=0xFF;
-      report.buttons[15]=0xFF;
-      report.axis[0] = -100;
-      //report.axis[15] = 100;
-      //report.axis[14] = -100;
       tud_hid_report(REPORT_ID_GAMEPAD, &report, sizeof(report));
       has_gamepad_key = true;
 
@@ -215,10 +229,14 @@ void hid_task(void)
   if ( board_millis() - start_ms < interval_ms) return; // not enough time
   start_ms += interval_ms;
 
-  uint32_t const btn = board_button_read();
+  ButtonState bt_set;
+  button_board_handle(bt_set);
+
+  struct GamepadReport gr_source = {};
+  bool some_button_pressed = fill_report(gr_source, bt_set);
 
   // Remote wakeup
-  if ( tud_suspended() && btn )
+  if ( tud_suspended() && some_button_pressed )
   {
     // Wake up host if we are in suspend mode
     // and REMOTE_WAKEUP feature is enabled by host
@@ -226,7 +244,7 @@ void hid_task(void)
   }else
   {
     // Send the 1st of report chain, the rest will be sent by tud_hid_report_complete_cb()
-    send_hid_report(REPORT_ID_GAMEPAD, 0xAAAAAAAA);
+    send_hid_report(REPORT_ID_GAMEPAD, gr_source);
   }
 }
 
@@ -285,11 +303,17 @@ void tud_hid_report_complete_cb(uint8_t instance, uint8_t const* report, uint16_
   (void) instance;
   (void) len;
 
+  ButtonState bt_set;
+  button_board_handle(bt_set);
+
+  struct GamepadReport gr_source = {};
+  fill_report(gr_source, bt_set);
+
   uint8_t next_report_id = report[0] + 1u;
 
   if (next_report_id < REPORT_ID_COUNT)
   {
-    send_hid_report(next_report_id, board_button_read());
+    send_hid_report(next_report_id, gr_source);
   }
 }
 
