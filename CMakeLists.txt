@@ -6,7 +6,7 @@ option(VARIANT_32_BUTTONS_ENABLED "Enable the 32-button variant configuration" O
 option(VARIANT_64_BUTTONS_ENABLED "Enable the 64-button variant configuration" OFF)
 option(VARIANT_128_BUTTONS_ENABLED "Enable the 128-button variant configuration" OFF)
 set(CONSOLE_DEBUG "MEDIUM" CACHE STRING "Console debug level")
-set_property(CACHE CONSOLE_DEBUG PROPERTY STRINGS "OFF" "LOW" "MEDIUM" "HIGH")
+set_property(CACHE CONSOLE_DEBUG PROPERTY STRINGS "0" "1" "2" "3")
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
 
@@ -82,11 +82,11 @@ endif()
 
 
 # Map text/booleans to numeric levels
-if(CONSOLE_DEBUG STREQUAL "HIGH")
+if(CONSOLE_DEBUG STREQUAL "3")
     set(NUM_LEVEL 3)
-elseif(CONSOLE_DEBUG STREQUAL "MEDIUM")
+elseif(CONSOLE_DEBUG STREQUAL "2")
     set(NUM_LEVEL 2)
-elseif(CONSOLE_DEBUG STREQUAL "LOW")
+elseif(CONSOLE_DEBUG STREQUAL "1")
     set(NUM_LEVEL 1)
 else()
     set(NUM_LEVEL 0)

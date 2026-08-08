@@ -4,7 +4,7 @@
     {
       "label": "cmake configure host",
       "type": "shell",
-      "command": "cmake -S . -B build -DHOST_BUILD=ON -DVARIANT_32_BUTTONS_ENABLED=ON",
+      "command": "cmake -S . -B build -DHOST_BUILD=ON -DCONSOLE_DEBUG=2 -DVARIANT_128_BUTTONS_ENABLED=ON",
       "group": "build",
       "problemMatcher": []
     },

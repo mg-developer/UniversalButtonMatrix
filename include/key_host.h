@@ -28,6 +28,8 @@
 
 #include <chrono>
 
+void VirtualGPIO_data_set(bool value);
+void VirtualGPIO_latch_set(bool value);
 bool VirtualGPIO_get(int key);
 
 #define cdc_log_fmt  printf

@@ -92,6 +92,19 @@ public:
         }
     }
 
+    void set_latch(bool latch)
+    {
+        if(latch != latch_state.load() && latch)
+        {
+            data_actual_state.store(data_temporary_state.load());
+        }
+        latch_state.store(latch);
+    }
+    void set_data(bool data)
+    {
+        data_temporary_state.store(data);
+    }
+
     int get_key() const
     {
         return key_register.load();
@@ -129,6 +142,9 @@ private:
     std::atomic<int> key_register;
     std::atomic<bool> stop_flag;
     std::thread input_thread;
+    std::atomic<bool> latch_state{false};
+    std::atomic<bool> data_temporary_state{false};
+    std::atomic<bool> data_actual_state{false};
 
     void press_key(int key)
     {
@@ -192,6 +208,16 @@ private:
 };
 
 VirtualGPIO gpio;
+
+void VirtualGPIO_data_set(bool value)
+{
+    gpio.set_data(value);
+}
+
+void VirtualGPIO_latch_set(bool value)
+{
+    gpio.set_latch(value);
+}
 
 bool VirtualGPIO_get(int key)
 {

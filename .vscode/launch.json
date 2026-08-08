@@ -2,32 +2,34 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch UniversalButtonMatrix_host (MSVC)",
+      "name": "Launch B32_UniversalButtonMatrix_host (MSVC)",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/Debug/UniversalButtonMatrix_host.exe",
+      "program": "${workspaceFolder}/build/Debug/UniversalButtonMatrix_host_32BTN.exe",
       "args": [],
       "cwd": "${workspaceFolder}",
       "preLaunchTask": "build host",
       "console": "externalConsole"
     },
     {
-      "name": "Launch UniversalButtonMatrix_host (GDB)",
-      "type": "cppdbg",
+      "name": "Launch B64_UniversalButtonMatrix_host (MSVC)",
+      "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/Debug/UniversalButtonMatrix_host.exe",
+      "program": "${workspaceFolder}/build/Debug/UniversalButtonMatrix_host_64BTN.exe",
       "args": [],
       "cwd": "${workspaceFolder}",
       "preLaunchTask": "build host",
-      "miDebuggerPath": "gdb.exe",
-      "externalConsole": true,
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        }
-      ]
+      "console": "externalConsole"
+    },
+      {
+      "name": "Launch B128_UniversalButtonMatrix_host (MSVC)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/Debug/UniversalButtonMatrix_host_128BTN.exe",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build host",
+      "console": "externalConsole"
     }
   ]
 }
