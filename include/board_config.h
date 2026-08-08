@@ -34,8 +34,8 @@
 //#define VARIANT_64_BUTTONS_ENABLED 1
 //#define VARIANT_128_BUTTONS_ENABLED 1
 
-//Disabled in current application
-#define SUPPORT_3_AXIS 1
+//Disabled in current application (Not fully implemented yet..)
+//#define SUPPORT_3_AXIS 1
 //#define SUPPORT_9_AXIS 1
 //#define SUPPORT_16_AXIS 1
 

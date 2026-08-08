@@ -81,67 +81,125 @@ tusb_desc_device_t const desc_device =
 
 uint8_t const desc_hid_report[] =
 {
-    0x05, 0x01,        // USAGE_PAGE (Generic Desktop Controls)
+    // ============================================================
+    // Gamepad
+    // ============================================================
+
+    0x05, 0x01,        // USAGE_PAGE (Generic Desktop)
     0x09, 0x05,        // USAGE (Gamepad)
     0xA1, 0x01,        // COLLECTION (Application)
-    0x85, REPORT_ID_GAMEPAD,        //   REPORT_ID (4)
 
-    // --- 64 Digital Buttons (8 Bytes) ---
-    0x05, 0x09,        //   USAGE_PAGE (Button)
-    0x19, 0x01,        //   USAGE_MINIMUM (Button 1)
-    0x29, 0x80,        //   USAGE_MAXIMUM (Button 128) 
-    0x15, 0x00,        //   LOGICAL_MINIMUM (0)
-    0x25, 0x01,        //   LOGICAL_MAXIMUM (1)
-    0x95, 0x80,        //   REPORT_COUNT (128)
-    0x75, 0x01,        //   REPORT_SIZE (1)
-    0x81, 0x02,        //   INPUT (Data,Var,Abs)
+    0x85, REPORT_ID_GAMEPAD,    // REPORT_ID
 
-  #if defined(SUPPORT_3_AXIS) || defined(SUPPORT_9_AXIS) || defined(SUPPORT_16_AXIS)
-    // -----------------------------------------------------------------
-    // 16 Axes (8-bit signed)
-    // -----------------------------------------------------------------
+    // ============================================================
+    // 128 Buttons
+    // ============================================================
+
+    0x05, 0x09,        // USAGE_PAGE (Button)
+    0x19, 0x01,        // USAGE_MINIMUM (Button 1)
+    0x29, 0x80,        // USAGE_MAXIMUM (Button 128)
+
+    0x15, 0x00,        // LOGICAL_MINIMUM (0)
+    0x25, 0x01,        // LOGICAL_MAXIMUM (1)
+
+    0x75, 0x01,        // REPORT_SIZE (1)
+    0x95, 0x80,        // REPORT_COUNT (128)
+
+    0x81, 0x02,        // INPUT (Data,Var,Abs)
+
+
+    // ============================================================
+    // Axes
+    // ============================================================
+
+#if defined(SUPPORT_3_AXIS) || \
+    defined(SUPPORT_9_AXIS) || \
+    defined(SUPPORT_16_AXIS)
+
     0x05, 0x01,        // USAGE_PAGE (Generic Desktop)
+
+#if defined(SUPPORT_3_AXIS) || \
+    defined(SUPPORT_9_AXIS) || \
+    defined(SUPPORT_16_AXIS)
 
     0x09, 0x30,        // X
     0x09, 0x31,        // Y
-    0x09, 0x32,        // Z  (3 axis)
+    0x09, 0x32,        // Z
+
 #endif
 
-#if defined(SUPPORT_9_AXIS) || defined(SUPPORT_16_AXIS) 
+#if defined(SUPPORT_9_AXIS) || defined(SUPPORT_16_AXIS)
+
     0x09, 0x33,        // Rx
     0x09, 0x34,        // Ry
     0x09, 0x35,        // Rz
-    0x09, 0x37,        // Slider-1
-    0x09, 0x38,        // Slider-2
-    0x09, 0x39,        // Slider-3  (9 axis)
+    0x09, 0x36,        // Slider
+    0x09, 0x37,        // Dial
+    0x09, 0x38,        // Wheel
+
 #endif
 
-#if defined(SUPPORT_16_AXIS) 
-    0x09, 0x3A,        // Slider-4 
-    0x09, 0x3B,        // Slider-5 
-    0x09, 0x3C,        // Slider-6 
+#if defined(SUPPORT_16_AXIS)
 
-    0x09, 0x3D,        // Slider-7 
-    0x09, 0x3E,        // Slider-8 
-    0x09, 0x3F,        // Slider-9 
-    0x09, 0x40,        // Slider-4  (16 axis)
+    // ------------------------------------------------------------
+    // Additional 7 axes
+    // Vendor Defined Usage Page
+    // ------------------------------------------------------------
+/*
+    0x06, 0x00, 0xFF,  // USAGE_PAGE (Vendor Defined 0)
+
+    0x09, 0x01,        // Axis 10
+    0x09, 0x02,        // Axis 11
+    0x09, 0x03,        // Axis 12
+    0x09, 0x04,        // Axis 13
+    0x09, 0x05,        // Axis 14
+    0x09, 0x06,        // Axis 15
+    0x09, 0x07,        // Axis 16
+*/
+
+    0x09, 0x39,        // Axis 10
+    0x09, 0x3A,        // Axis 11
+    0x09, 0x3B,        // Axis 12
+    0x09, 0x3C,        // Axis 13
+    0x09, 0x3D,        // Axis 14
+    0x09, 0x3E,        // Axis 15
+    0x09, 0x3F,        // Axis 16
+
 #endif
+
+    // ------------------------------------------------------------
+    // Axis data
+    // ------------------------------------------------------------
 
     0x15, 0x81,        // LOGICAL_MINIMUM (-127)
     0x25, 0x7F,        // LOGICAL_MAXIMUM (127)
+
     0x75, 0x08,        // REPORT_SIZE (8)
+
 #if defined(SUPPORT_3_AXIS)
-    0x95, 0x03,    // 3 axes
+
+    0x95, 0x03,        // REPORT_COUNT (3)
+
 #elif defined(SUPPORT_9_AXIS)
-    0x95, 0x09,    // 9 axes
+
+    0x95, 0x09,        // REPORT_COUNT (9)
+
 #elif defined(SUPPORT_16_AXIS)
-    0x95, 0x10,    // 16 axes
+
+    0x95, 0x10,        // REPORT_COUNT (16)
+
 #endif
-    0x81, 0x02,
+
+    0x81, 0x02,        // INPUT (Data,Var,Abs)
+
+#endif // AXIS SUPPORT
+
+    // ============================================================
+    // End Gamepad
+    // ============================================================
 
     0xC0               // END_COLLECTION
 };
-
 
 // Invoked when received GET DEVICE DESCRIPTOR
 // Application return pointer to descriptor

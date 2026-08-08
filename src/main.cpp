@@ -115,10 +115,11 @@ int main()
         if (!startup_logged &&
             absolute_time_diff_us(connected_time, get_absolute_time()) > 500000)
         {
-            cdc_log_fmt("%d: Configured ROWxCOL [%dx%d]\r\n",
+            cdc_log_fmt("%d: == Configured ROWxCOL [%dx%d], Axis count:%d ==\r\n",
                       logline++,
                       BUTTON_OUTPUT_ROWS,
-                      BUTTON_INPUT_COLUMNS);
+                      BUTTON_INPUT_COLUMNS,
+                      EnabledAxisSupportCount);
 
             startup_logged = true;
         }
