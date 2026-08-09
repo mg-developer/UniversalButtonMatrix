@@ -1,18 +1,41 @@
-# UniversalButtonMatrix
+# Universal Button Matrix
 
-Description here
-Universal, easy to adopt application
+UniversalButtonMatrix is a configurable Raspberry Pi Pico firmware for large button matrices. It uses shift registers to expand button inputs while minimizing MCU GPIO usage.
 
-## Firmware 
+The design requires only a few output pins to steer the shift registers and a smaller number of input pins to read back the matrix state. For example, 4 output pins plus 1 input pin can scan 24 or more buttons, and the system scales by chaining additional shift register stages. This keeps the Pico's native GPIOs available for other peripherals while supporting larger button arrays.
 
+## Firmware
 
-## Example hardware setup
+This firmware supports three build-time variants: `VARIANT_32_BUTTONS_ENABLED`, `VARIANT_64_BUTTONS_ENABLED`, and `VARIANT_128_BUTTONS_ENABLED`. Exactly one variant must be enabled to set the matrix dimensions and HID report size.
 
-**About PicoBoard RP2040**
+The 32-button variant has lower latency than the larger variants, since it uses fewer columns and rows.
+
+The build also supports a host simulation mode via `HOST_BUILD`. When `HOST_BUILD=ON`, the code compiles a PC-side tester instead of Pico firmware, allowing verification without actual hardware.
+
+`CONSOLE_DEBUG` controls runtime debug output verbosity for the Pico build:
+- `0`: no serial/CDC debug output
+- `1`: minimal verbosity — displays core loop timing only, useful for worst-case latency diagnostics
+- `2`: medium verbosity — shows a button-press console visualization
+- `3`: maximum verbosity — not used yet
+
+**About PicoBoard RP2040-Zero**
+![](doc/RP2040.png)
+The software is designed primarily for PicoBoard RP2040-Zero, but it is easy to adapt to other Raspberry Pi compatible boards.
+
+Used pinouts:
+| *RPi-GPIO* | *Assignment* |
+| --- |---:|
+| 27 | LATCH |
+| 26 | REGISTER CLEAR |
+| 15 | DATA OUTPUT |
+| 14 | CLOCK |
+| 4, 5, 6, 7, 8 | ROW 1-5 INPUT |
+| 9, 10, 11, 12, 13 | ROW 6-10 INPUT |
 
 **About matrix keyboard**
 
 **About shift register board**
+More columns require more RP2040 bit shifting, which increases scan latency.
 
 ## Build
 
