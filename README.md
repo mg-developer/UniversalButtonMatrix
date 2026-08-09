@@ -1,5 +1,19 @@
 # UniversalButtonMatrix
 
+Description here
+Universal, easy to adopt application
+
+## Firmware 
+
+
+## Example hardware setup
+
+**About PicoBoard RP2040**
+
+**About matrix keyboard**
+
+**About shift register board**
+
 ## Build
 
 Build instructions for both x86 host testing and the Raspberry Pi Pico target.
@@ -37,11 +51,11 @@ cmake -DPICO_SDK_PATH=/path/to/pico-sdk -DVARIANT_128_BUTTONS_ENABLED=1 -DCONSOL
 
 Final build, ready to upload appear as *UniversalButtonMatrix_128BTN.uf2*
 
-**Docker (Windows) build (optional)**
+**Docker (Windows) build**
 
-This repository includes a Dockerfile at `UBM-PicoBuild.dockerfile` for Windows-based Pico builds.
+This repository includes a Dockerfile at `UBM-PicoBuild.dockerfile` for any-OS-docker-based Pico builds.
 
-Build the Docker image from the repository root:
+Build the Docker image from the repository root (Windows example):
 
 ```powershell
 # PowerShell
@@ -58,7 +72,7 @@ Notes:
 - Update `UBM-PicoBuild.dockerfile` if you need a different Pico SDK version or toolchain.
 - On Windows, ensure Docker has access to your drive when mounting volumes.
 
-**TODO: (future development)**
+## TODOs:
 - Document that the USB descriptor implementation currently supports only 9 axes; 16-axis support is not implemented and hardware integration is still pending.
 - Polish the PC-host build/system simulator, add more simulator functionality, and improve its integration with the actual hardware workflows.
 

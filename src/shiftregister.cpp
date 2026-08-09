@@ -163,10 +163,6 @@ void register_push(uint32_t value, uint8_t bit_count)
     for (uint32_t mask = 1u << (bit_count - 1); mask > 0; mask >>= 1)
     {
         bool state = (value & mask) != 0;
-
-    //for (int bit = bit_count - 1; bit >= 0; --bit)
-    //{
-    //    bool state = (value >> bit) & 1;
         gpio_put(button_pins[DATA], state);
         clk();
     }

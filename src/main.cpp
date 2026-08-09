@@ -64,7 +64,7 @@ bool Buttons[128] = {};
 #pragma pack(push,1)
 struct GamepadReport
 {
-    uint8_t buttons[16];
+    uint8_t buttons[(BUTTON_HID_REPORT_COUNT / 8)];
 
 #if defined(SUPPORT_3_AXIS) || \
     defined(SUPPORT_9_AXIS) || \
@@ -74,7 +74,7 @@ struct GamepadReport
 };
 #pragma pack(pop)
 
-static_assert(sizeof(GamepadReport) == 16 + (EnabledAxisSupportCount));
+static_assert(sizeof(GamepadReport) == (BUTTON_HID_REPORT_COUNT / 8) + (EnabledAxisSupportCount));
 
 struct GamepadReport report;
 
@@ -114,10 +114,11 @@ int main()
         if (!startup_logged &&
             absolute_time_diff_us(connected_time, get_absolute_time()) > 500000)
         {
-            cdc_log_fmt("%d: == Configured ROWxCOL [%dx%d], Axis count:%d ==\r\n",
+            cdc_log_fmt("%d: == Configured ROWxCOL [%dx%d], Report size:%db, Axis count:%d ==\r\n",
                       logline++,
                       BUTTON_INPUT_ROWS,
                       BUTTON_OUTPUT_COLUMNS,
+                      sizeof(struct GamepadReport),
                       EnabledAxisSupportCount);
 
             startup_logged = true;

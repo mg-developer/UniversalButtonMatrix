@@ -22,6 +22,7 @@
  */
 
 #include "board_config.h"  
+#include "shiftregister.h"
 #include "bsp/board_api.h"
 #include "tusb.h"
 #include "usb_descriptors.h"
@@ -97,13 +98,13 @@ uint8_t const desc_hid_report[] =
 
     0x05, 0x09,        // USAGE_PAGE (Button)
     0x19, 0x01,        // USAGE_MINIMUM (Button 1)
-    0x29, 0x80,        // USAGE_MAXIMUM (Button 128)
+    0x29, BUTTON_HID_REPORT_COUNT,        // USAGE_MAXIMUM (Button N)
 
     0x15, 0x00,        // LOGICAL_MINIMUM (0)
     0x25, 0x01,        // LOGICAL_MAXIMUM (1)
 
     0x75, 0x01,        // REPORT_SIZE (1)
-    0x95, 0x80,        // REPORT_COUNT (128)
+    0x95, BUTTON_HID_REPORT_COUNT,        // REPORT_COUNT (N)
 
     0x81, 0x02,        // INPUT (Data,Var,Abs)
 
@@ -145,7 +146,7 @@ uint8_t const desc_hid_report[] =
     // Additional 7 axes
     // Vendor Defined Usage Page
     // ------------------------------------------------------------
-/*
+
     0x06, 0x00, 0xFF,  // USAGE_PAGE (Vendor Defined 0)
 
     0x09, 0x01,        // Axis 10
@@ -155,15 +156,6 @@ uint8_t const desc_hid_report[] =
     0x09, 0x05,        // Axis 14
     0x09, 0x06,        // Axis 15
     0x09, 0x07,        // Axis 16
-*/
-
-    0x09, 0x39,        // Axis 10
-    0x09, 0x3A,        // Axis 11
-    0x09, 0x3B,        // Axis 12
-    0x09, 0x3C,        // Axis 13
-    0x09, 0x3D,        // Axis 14
-    0x09, 0x3E,        // Axis 15
-    0x09, 0x3F,        // Axis 16
 
 #endif
 
