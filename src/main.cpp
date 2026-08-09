@@ -26,7 +26,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <iostream>
 
 #include "shiftregister.h"
 #include "bsp/board_api.h"

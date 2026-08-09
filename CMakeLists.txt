@@ -10,6 +10,12 @@ set_property(CACHE CONSOLE_DEBUG PROPERTY STRINGS "0" "1" "2" "3")
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
 
+if(NOT DEFINED ENV{PICO_SDK_PATH})
+    if(DEFINED PICO_SDK_PATH)
+        set(ENV{PICO_SDK_PATH} "${PICO_SDK_PATH}")
+    endif()
+endif()
+
 if(HOST_BUILD)
     project(UniversalButtonMatrix_host C CXX)
 
