@@ -21,7 +21,7 @@
       "preLaunchTask": "build host",
       "console": "externalConsole"
     },
-      {
+    {
       "name": "Launch B128_UniversalButtonMatrix_host (MSVC)",
       "type": "cppvsdbg",
       "request": "launch",
@@ -30,6 +30,37 @@
       "cwd": "${workspaceFolder}",
       "preLaunchTask": "build host",
       "console": "externalConsole"
+    },
+        {
+      "name": "Launch B32_UniversalButtonMatrix_host (LINUX)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/UniversalButtonMatrix_host_32BTN",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "externalConsole": false, // Uses the internal VS Code console instead of an external one.
+      "preLaunchTask": "build host",
+    },
+        {
+      "name": "Launch B64_UniversalButtonMatrix_host (LINUX)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/UniversalButtonMatrix_host_64BTN",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "externalConsole": false, // Uses the internal VS Code console instead of an external one.
+      "preLaunchTask": "build host",
+    },
+    {
+      "name": "Launch B128_UniversalButtonMatrix_host (LINUX)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/UniversalButtonMatrix_host_128BTN",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "externalConsole": false, // Uses the internal VS Code console instead of an external one.
+      "preLaunchTask": "build host",
     }
+
   ]
 }

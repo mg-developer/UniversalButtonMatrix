@@ -11,7 +11,7 @@
     {
       "label": "build host",
       "type": "shell",
-      "command": "cmake --build build --target UniversalButtonMatrix_host --config Debug",
+      "command": "cmake --build build --config Debug",
       "group": {
         "kind": "build",
         "isDefault": true

@@ -117,8 +117,8 @@ int main()
         {
             cdc_log_fmt("%d: == Configured ROWxCOL [%dx%d], Axis count:%d ==\r\n",
                       logline++,
-                      BUTTON_OUTPUT_ROWS,
-                      BUTTON_INPUT_COLUMNS,
+                      BUTTON_INPUT_ROWS,
+                      BUTTON_OUTPUT_COLUMNS,
                       EnabledAxisSupportCount);
 
             startup_logged = true;

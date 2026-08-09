@@ -368,7 +368,7 @@ char const *string_desc_arr[] =
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
   "sysprog.pl",                  // 1: Manufacturer
   MODULE_NAME,                   // 2: Product
-  "1",                           // 3: Serials will use unique ID if possible
+  NULL,                          // 3: Serials will use unique ID if possible
 };
 
 static uint16_t _desc_str[32 + 1];
