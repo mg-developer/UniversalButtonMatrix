@@ -1,4 +1,4 @@
-# Universal Button Matrix
+# Universal Button Matrix v1.0
 
 UniversalButtonMatrix is a configurable Raspberry Pi Pico firmware for large button matrices. It leverages shift registers to expand button inputs while minimizing Raspberry Pi Pico GPIO usage.
 
@@ -10,7 +10,6 @@ The design uses only a few output pins to steer the shift registers and a small 
 - Shift-register based input expansion with low GPIO usage
 - HID gamepad-style USB report generation for PC use
 - Optional host-side simulator/tester build via `HOST_BUILD`
-- Example board and wiring information for PicoBoard RP2040-Zero
 
 ## Firmware options
 
@@ -76,7 +75,7 @@ Example application:
 
 ![](doc/Schem1.png)
 
-Hardware package: [KiCad10 ShiftRegisters.zip](doc/ShiftRegisters.zip)
+Hardware package Schematic/PCB: [KiCad10 ShiftRegisters.zip](doc/ShiftRegisters.zip)
 
 ## Software Build
 
@@ -86,7 +85,7 @@ Build instructions for both x86 host testing and the Raspberry Pi Pico target.
 
 - `cmake` 3.13 or newer
 - Pico SDK installed and accessible via `PICO_SDK_PATH`
-- `gcc-arm-none-eabi` toolchain for Pico builds
+- `gcc-arm-none-eabi` toolchain for Pico builds, Download [gnu-toolchains-for-arm](https://gitlab.arm.com/tooling/gnu-toolchains-for-arm/-/tree/releases/14.3.rel1?ref_type=heads)
 - Optional: Docker for containerized builds
 
 ### Project status
