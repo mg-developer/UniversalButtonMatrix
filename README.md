@@ -1,45 +1,100 @@
 # Universal Button Matrix
 
-UniversalButtonMatrix is a configurable Raspberry Pi Pico firmware for large button matrices. It uses shift registers to expand button inputs while minimizing MCU GPIO usage.
+UniversalButtonMatrix is a configurable Raspberry Pi Pico firmware for large button matrices. It leverages shift registers to expand button inputs while minimizing Raspberry Pi Pico GPIO usage.
 
-The design requires only a few output pins to steer the shift registers and a smaller number of input pins to read back the matrix state. For example, 4 output pins plus 1 input pin can scan 24 or more buttons, and the system scales by chaining additional shift register stages. This keeps the Pico's native GPIOs available for other peripherals while supporting larger button arrays.
+The design uses only a few output pins to steer the shift registers and a small number of input pins to read back row state. For example, 4 output pins plus 1 input pin can scan 24 or more buttons, and the system scales by chaining additional shift register stages. This keeps the Pico's native GPIOs available for peripherals while supporting larger button arrays.
 
-## Firmware
+## Features
 
-This firmware supports three build-time variants: `VARIANT_32_BUTTONS_ENABLED`, `VARIANT_64_BUTTONS_ENABLED`, and `VARIANT_128_BUTTONS_ENABLED`. Exactly one variant must be enabled to set the matrix dimensions and HID report size.
+- Expandable button matrix support for 32, 64, and 128 buttons
+- Shift-register based input expansion with low GPIO usage
+- HID gamepad-style USB report generation for PC use
+- Optional host-side simulator/tester build via `HOST_BUILD`
+- Example board and wiring information for PicoBoard RP2040-Zero
 
-The 32-button variant has lower latency than the larger variants, since it uses fewer columns and rows.
+## Firmware options
 
-The build also supports a host simulation mode via `HOST_BUILD`. When `HOST_BUILD=ON`, the code compiles a PC-side tester instead of Pico firmware, allowing verification without actual hardware.
+This firmware supports three build-time button matrix variants:
+- `VARIANT_32_BUTTONS_ENABLED`
+- `VARIANT_64_BUTTONS_ENABLED`
+- `VARIANT_128_BUTTONS_ENABLED`
 
-`CONSOLE_DEBUG` controls runtime debug output verbosity for the Pico build:
+Exactly one variant must be enabled to set the matrix dimensions and HID report size. See [include/shiftregister.h](include/shiftregister.h#L1).
+
+The 32-button variant has lower latency than the larger variants because it uses fewer shift-register-driven columns.
+
+`HOST_BUILD`
+- When `HOST_BUILD=ON`, the project builds a PC-side tester instead of Pico firmware, enabling verification without physical hardware.
+
+`CONSOLE_DEBUG`
+Controls runtime debug output verbosity for the Pico build:
 - `0`: no serial/CDC debug output
-- `1`: minimal verbosity — displays core loop timing only, useful for worst-case latency diagnostics
+- `1`: minimal verbosity — displays core loop timing only, useful for latency diagnostics
 - `2`: medium verbosity — shows a button-press console visualization
-- `3`: maximum verbosity — not used yet
+![](doc/ConsoleDump.png)
+- `3`: maximum verbosity — reserved for future use
+
+
+
+## Hardware application
+
+Complete (example) hardware setup follows:
+
+![](doc/HardwareSetup.png)
 
 **About PicoBoard RP2040-Zero**
+
 ![](doc/RP2040.png)
-The software is designed primarily for PicoBoard RP2040-Zero, but it is easy to adapt to other Raspberry Pi compatible boards.
+
+The software is designed primarily for PicoBoard RP2040-Zero, but it is easy to adapt to other Raspberry Pi compatible boards. The entire system is powered via the USB port (and uses the built-in 3.3V RP2040 power line)
 
 Used pinouts:
 | *RPi-GPIO* | *Assignment* |
 | --- |---:|
 | 27 | LATCH |
 | 26 | REGISTER CLEAR |
-| 15 | DATA OUTPUT |
+| 15 | SERIAL DATA OUTPUT |
 | 14 | CLOCK |
 | 4, 5, 6, 7, 8 | ROW 1-5 INPUT |
 | 9, 10, 11, 12, 13 | ROW 6-10 INPUT |
 
 **About matrix keyboard**
 
-**About shift register board**
-More columns require more RP2040 bit shifting, which increases scan latency.
+Matrix button layout with diodes is recommended:
 
-## Build
+![](doc/Matrix.png)
+
+**About shift register board**
+
+Simple register board is based on two inexpensive devices 74HC164, 74LS573 and can be easily extended by repeating the pattern:
+
+![](doc/Schem2.png)
+
+Keep in mind that more columns increase the serial data pipeline length. This adds RP2040 bit shifting and raises polling latency.
+
+Example application:
+
+![](doc/Schem1.png)
+
+Hardware package: [KiCad10 ShiftRegisters.zip](doc/ShiftRegisters.zip)
+
+## Software Build
 
 Build instructions for both x86 host testing and the Raspberry Pi Pico target.
+
+### Prerequisites
+
+- `cmake` 3.13 or newer
+- Pico SDK installed and accessible via `PICO_SDK_PATH`
+- `gcc-arm-none-eabi` toolchain for Pico builds
+- Optional: Docker for containerized builds
+
+### Project status
+
+- Core Pico firmware and host simulator are implemented
+- 32 / 64 / 128 button variants supported
+- HID descriptor currently supports 9 axes only; 16-axis support is not implemented yet
+- USB hardware integration and host simulator polishing are still in progress
 
 **x86 (host) build — quick testing**
 
@@ -72,11 +127,11 @@ If you prefer to pass the path as a CMake cache variable, the build now also sup
 cmake -DPICO_SDK_PATH=/path/to/pico-sdk -DVARIANT_128_BUTTONS_ENABLED=1 -DCONSOLE_DEBUG=0 -DCMAKE_BUILD_TYPE=Release ..
 ```
 
-Final build, ready to upload appear as *UniversalButtonMatrix_128BTN.uf2*
+The final built UF2 file will appear as *UniversalButtonMatrix_128BTN.uf2*.
 
 **Docker (Windows) build**
 
-This repository includes a Dockerfile at `UBM-PicoBuild.dockerfile` for any-OS-docker-based Pico builds.
+This repository includes a Dockerfile at `UBM-PicoBuild.dockerfile` for cross-platform Pico builds in Docker.
 
 Build the Docker image from the repository root (Windows example):
 
@@ -94,6 +149,14 @@ docker run --rm -v ${PWD}:/work -w /work pico-build -lc "rm -rf build && cmake -
 Notes:
 - Update `UBM-PicoBuild.dockerfile` if you need a different Pico SDK version or toolchain.
 - On Windows, ensure Docker has access to your drive when mounting volumes.
+
+## Contributing
+
+Contributions are welcome. Please open issues for bugs or feature requests, and submit pull requests for fixes and improvements.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ## TODOs:
 - Document that the USB descriptor implementation currently supports only 9 axes; 16-axis support is not implemented and hardware integration is still pending.
