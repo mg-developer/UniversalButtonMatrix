@@ -46,6 +46,7 @@ else()
         src/main.cpp
         src/usb_descriptors.cpp
         src/shiftregister.cpp
+        src/analogaxis.cpp
         ${SRC_HEADERS}
     )
 
@@ -53,6 +54,7 @@ else()
         pico_stdlib
         tinyusb_device
         tinyusb_board
+        hardware_adc
     )
 
     target_include_directories(${PROJECT_NAME} PRIVATE
@@ -65,6 +67,7 @@ else()
 
     pico_enable_stdio_usb(${PROJECT_NAME} 0)
     pico_add_extra_outputs(${PROJECT_NAME})
+
 endif()
 
 if(VARIANT_32_BUTTONS_ENABLED)

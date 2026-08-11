@@ -161,7 +161,7 @@ bool fill_report(GamepadReport& dst_gr, const ButtonState& src_state)
 
 // Invoked when device is mounted
 void tud_mount_cb()
-{
+{ANALOGAXIS_H
   blink_interval_ms = BLINK_MOUNTED;
 }
 
@@ -232,7 +232,7 @@ void hid_task(void)
   if ( board_millis() - start_ms < interval_ms) return; // not enough time
   start_ms += interval_ms;
 
-  ButtonState bt_set;
+  ButtonState bt_set{};
   button_board_handle(bt_set);
 
   struct GamepadReport gr_source = {};

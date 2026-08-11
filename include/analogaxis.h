@@ -38,7 +38,7 @@
 #define EnabledAxisSupportCount 0
 #endif
 
-using AnalogState = std::array<int8_t, EnabledAxisSupportCount>;
+using AnalogState = std::array<int, EnabledAxisSupportCount>;
 
 void analog_board_init();
 void analog_board_handle(AnalogState& ax_set);

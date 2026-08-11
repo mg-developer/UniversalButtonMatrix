@@ -25,8 +25,8 @@
 #include "analogaxis.h"
 
 #if HOST_BUILD == 0
-#include "pico/stdlib.h"
-#include "hardware/adc.h"
+#include <pico/stdlib.h>
+#include <hardware/adc.h>
 #endif
 
 static constexpr uint8_t ANALOG_X_PIN = 29;
@@ -34,9 +34,9 @@ static constexpr uint8_t ANALOG_Y_PIN = 28;
 static constexpr uint8_t ANALOG_X_CHANNEL = 3;
 static constexpr uint8_t ANALOG_Y_CHANNEL = 2;
 
-static uint8_t adc_raw_to_axis(uint16_t raw)
+static int adc_raw_to_axis(uint16_t raw)
 {
-    return static_cast<uint8_t>((raw + 8u) >> 4u);
+    return static_cast<int>((raw + 8u) >> 4u);
 }
 
 void analog_board_init()
