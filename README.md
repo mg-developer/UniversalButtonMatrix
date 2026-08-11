@@ -66,13 +66,15 @@ Matrix button layout with diodes is recommended:
 
 ![](doc/Matrix.png)
 
+(Software debounce is not implemented currently)
+
 **About shift register board**
 
 Simple register board is based on two inexpensive devices 74HC164, 74LS573 and can be easily extended by repeating the pattern:
 
 ![](doc/Schem2.png)
 
-Keep in mind that more columns increase the serial data pipeline length. This adds RP2040 bit shifting and raises polling latency.
+Keep in mind that more columns increase the serial data pipeline length. This adds RP2040 bit shifting increases the polling latency, which is approximately 2.5-8 ms.
 
 Example application:
 
@@ -160,7 +162,6 @@ Contributions are welcome. Please open issues for bugs or feature requests, and 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ## TODOs:
-- Document that the USB descriptor implementation currently supports only 9 axes; 16-axis support is not implemented and hardware integration is still pending.
+- Document that the USB descriptor implementation currently supports only 9 axes; 16-axis support is not implemented (USB descriptor issue) and hardware verification is still pending.
 - Polish the PC-host build/system simulator, add more simulator functionality, and improve its integration with the actual hardware workflows.
-
-
+- Button debounce strategy is not applied currently
