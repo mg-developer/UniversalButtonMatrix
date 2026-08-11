@@ -51,14 +51,14 @@ The software is designed primarily for PicoBoard RP2040-Zero, but it is easy to 
 Used pinouts:
 | *RPi-GPIO* | *Assignment* |
 | --- |---:|
-| 29 | ANALOG AXIS X |
-| 28 | ANALOG AXIS Y |
-| 27 | LATCH |
-| 26 | REGISTER CLEAR |
-| 15 | SERIAL DATA OUTPUT |
-| 14 | CLOCK |
-| 4, 5, 6, 7, 8 | ROW 1-5 INPUT |
-| 9, 10, 11, 12, 13 | ROW 6-10 INPUT |
+| GP29 | ANALOG AXIS X |
+| GP28 | ANALOG AXIS Y |
+| GP27 | LATCH |
+| GP26 | REGISTER CLEAR |
+| GP15 | SERIAL DATA OUTPUT |
+| GP14 | CLOCK |
+| GP4, GP5, GP6, GP7, GP8 | ROW 1-5 INPUT |
+| GP9, GP10, GP11, GP12, GP13 | ROW 6-10 INPUT |
 
 **About matrix keyboard**
 
@@ -138,7 +138,6 @@ This repository includes a Dockerfile at `UBM-PicoBuild.dockerfile` for cross-pl
 Build the Docker image from the repository root (Windows example):
 
 ```powershell
-# PowerShell
 docker build -f UBM-PicoBuild.dockerfile -t pico-build .
 ```
 
