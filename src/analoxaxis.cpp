@@ -22,22 +22,49 @@
  * THE SOFTWARE.
  *
  */
+#include "analogaxis.h"
 
-#ifndef BOARD_CONFIG_H
-#define BOARD_CONFIG_H
+#if HOST_BUILD == 0
+#include "pico/stdlib.h"
+#include "hardware/adc.h"
+#endif
 
-//Defines are overrided by CMake options
+static constexpr uint8_t ANALOG_X_PIN = 29;
+static constexpr uint8_t ANALOG_Y_PIN = 28;
+static constexpr uint8_t ANALOG_X_CHANNEL = 3;
+static constexpr uint8_t ANALOG_Y_CHANNEL = 2;
 
-//#define CONSOLE_DEBUG 1
+static uint8_t adc_raw_to_axis(uint16_t raw)
+{
+    return static_cast<uint8_t>((raw + 8u) >> 4u);
+}
 
-//#define VARIANT_32_BUTTONS_ENABLED 1
-//#define VARIANT_64_BUTTONS_ENABLED 1
-//#define VARIANT_128_BUTTONS_ENABLED 1
+void analog_board_init()
+{
+#if HOST_BUILD == 0
+    adc_init();
+    adc_gpio_init(ANALOG_X_PIN);
+    adc_gpio_init(ANALOG_Y_PIN);
+#endif
+}
 
-//Disabled in current application (Not fully implemented yet..)
-#define SUPPORT_3_AXIS 1
-//#define SUPPORT_9_AXIS 1
-//#define SUPPORT_16_AXIS 1
+void analog_board_handle(AnalogState& ax_set)
+{
+#if HOST_BUILD == 0
+    adc_select_input(ANALOG_X_CHANNEL);
+    const uint16_t raw_x = adc_read();
 
+    adc_select_input(ANALOG_Y_CHANNEL);
+    const uint16_t raw_y = adc_read();
 
-#endif // BOARD_CONFIG_H
+    if (ax_set.size() > 0u)
+        ax_set[0] = adc_raw_to_axis(raw_x);
+    if (ax_set.size() > 1u)
+        ax_set[1] = adc_raw_to_axis(raw_y);
+    if (ax_set.size() > 2u)
+        ax_set[2] = 128; //Unused axis, set to center position
+#else
+    for (auto &value : ax_set)
+        value = 128; //Unused axis, set to center position
+#endif
+}

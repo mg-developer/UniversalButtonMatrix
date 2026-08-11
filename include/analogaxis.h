@@ -22,22 +22,25 @@
  * THE SOFTWARE.
  *
  */
+#ifndef ANALOGAXIS_H
+#define ANALOGAXIS_H
 
-#ifndef BOARD_CONFIG_H
-#define BOARD_CONFIG_H
+#include "board_config.h"
+#include <array>
 
-//Defines are overrided by CMake options
+#if defined(SUPPORT_3_AXIS)
+#define EnabledAxisSupportCount 3
+#elif defined(SUPPORT_9_AXIS)
+#define EnabledAxisSupportCount 9
+#elif defined(SUPPORT_16_AXIS)
+#define EnabledAxisSupportCount 16
+#else
+#define EnabledAxisSupportCount 0
+#endif
 
-//#define CONSOLE_DEBUG 1
+using AnalogState = std::array<int8_t, EnabledAxisSupportCount>;
 
-//#define VARIANT_32_BUTTONS_ENABLED 1
-//#define VARIANT_64_BUTTONS_ENABLED 1
-//#define VARIANT_128_BUTTONS_ENABLED 1
+void analog_board_init();
+void analog_board_handle(AnalogState& ax_set);
 
-//Disabled in current application (Not fully implemented yet..)
-#define SUPPORT_3_AXIS 1
-//#define SUPPORT_9_AXIS 1
-//#define SUPPORT_16_AXIS 1
-
-
-#endif // BOARD_CONFIG_H
+#endif //ANALOGAXIS_H

@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include "shiftregister.h"
+#include "analogaxis.h"
 #include "bsp/board_api.h"
 #include "tusb.h"
 
@@ -93,6 +94,7 @@ int main()
   board_init_after_tusb();
 
   button_board_init();
+  analog_board_init();
 
   static bool startup_logged = false;
   static bool connected = false;
@@ -236,6 +238,17 @@ void hid_task(void)
   struct GamepadReport gr_source = {};
   bool some_button_pressed = fill_report(gr_source, bt_set);
 
+#if defined(SUPPORT_3_AXIS) || defined(SUPPORT_9_AXIS) || defined(SUPPORT_16_AXIS)
+  {
+      AnalogState ax_set{};
+      analog_board_handle(ax_set);
+      for (size_t i = 0; i < EnabledAxisSupportCount; ++i)
+      {
+          gr_source.axes[i] = static_cast<int8_t>(static_cast<int>(ax_set[i]) - 128);
+      }
+  }
+#endif
+
   // Remote wakeup
   if ( tud_suspended() && some_button_pressed )
   {
@@ -309,6 +322,17 @@ void tud_hid_report_complete_cb(uint8_t instance, uint8_t const* report, uint16_
 
   struct GamepadReport gr_source = {};
   fill_report(gr_source, bt_set);
+
+#if defined(SUPPORT_3_AXIS) || defined(SUPPORT_9_AXIS) || defined(SUPPORT_16_AXIS)
+  {
+      AnalogState ax_set{};
+      analog_board_handle(ax_set);
+      for (size_t i = 0; i < EnabledAxisSupportCount; ++i)
+      {
+          gr_source.axes[i] = static_cast<int8_t>(static_cast<int>(ax_set[i]) - 128);
+      }
+  }
+#endif
 
   uint8_t next_report_id = report[0] + 1u;
 

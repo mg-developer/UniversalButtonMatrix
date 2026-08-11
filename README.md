@@ -2,18 +2,17 @@
 
 UniversalButtonMatrix is a configurable Raspberry Pi Pico firmware for large button matrices. It leverages shift registers to expand button inputs while minimizing Raspberry Pi Pico GPIO usage.
 
-The design uses only a few output pins to steer the shift registers and a small number of input pins to read back row state. For example, 4 output pins plus 1 input pin can scan 24 or more buttons, and the system scales by chaining additional shift register stages. This keeps the Pico's native GPIOs available for peripherals while supporting larger button arrays.
+The design uses only a few output pins to steer the shift registers and a small number of input pins to read back row state. For example, 4 output pins plus 1 input pin can scan any number of buttons because system scales by chaining additional shift register stages. This keeps the Pico's native GPIOs available for peripherals while supporting larger button arrays.
 
 ## Features
 
-- Expandable button matrix support for 32, 64, and 128 buttons
-- Shift-register based input expansion with low GPIO usage
-- HID gamepad-style USB report generation for PC use
+- Preconfigured button matrix supports 32, 64, and 128 buttons
+- RP2040/Pico firmware configured as a USB HID controller (gamepad style)
 - Optional host-side simulator/tester build via `HOST_BUILD`
 
 ## Firmware options
 
-This firmware supports three build-time button matrix variants:
+This firmware supports three build-time button matrix variants (easy to extend):
 - `VARIANT_32_BUTTONS_ENABLED`
 - `VARIANT_64_BUTTONS_ENABLED`
 - `VARIANT_128_BUTTONS_ENABLED`
@@ -21,6 +20,8 @@ This firmware supports three build-time button matrix variants:
 Exactly one variant must be enabled to set the matrix dimensions and HID report size. See [include/shiftregister.h](include/shiftregister.h#L1).
 
 The 32-button variant has lower latency than the larger variants because it uses fewer shift-register-driven columns.
+
+The 128-button variant is the maximum supported by the USB HID gamepad protocol used here. Larger matrix hardware can be scanned, but only 128 buttons can be reported over the USB HID descriptor.
 
 `HOST_BUILD`
 - When `HOST_BUILD=ON`, the project builds a PC-side tester instead of Pico firmware, enabling verification without physical hardware.
@@ -50,6 +51,8 @@ The software is designed primarily for PicoBoard RP2040-Zero, but it is easy to 
 Used pinouts:
 | *RPi-GPIO* | *Assignment* |
 | --- |---:|
+| 29 | ANALOG AXIS X |
+| 28 | ANALOG AXIS Y |
 | 27 | LATCH |
 | 26 | REGISTER CLEAR |
 | 15 | SERIAL DATA OUTPUT |
